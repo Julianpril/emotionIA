@@ -233,7 +233,7 @@ def traducir_a_ingles(texto):
             return texto, 'unknown', False
 
 # Función para predecir emoción
-def predecir_emocion(texto, modelo, vectorizer):
+def predecir_emocion(texto, modelo, vectorizer, encoder):
     
     # Traducir a inglés si es necesario
     texto_ingles, idioma, fue_traducido = traducir_a_ingles(texto)
@@ -253,16 +253,26 @@ def predecir_emocion(texto, modelo, vectorizer):
     # Vectorizar con TF-IDF (10,000 features)
     texto_vector = vectorizer.transform([texto_limpio])
     
-    # Predecir directamente con LightGBM (no necesita DataFrame)
-    emocion = modelo.predict(texto_vector)[0]
-    
-    # Obtener probabilidades para calcular confianza
-    probabilidades = modelo.predict_proba(texto_vector)[0]
-    confianza = probabilidades.max()
-    
-    # Crear diccionario con todas las probabilidades
-    clases = modelo.classes_
-    probs_dict = dict(zip(clases, probabilidades))
+    # Verificar si el modelo es Booster (LightGBM nativo) o LGBMClassifier (sklearn wrapper)
+    import lightgbm as lgb
+    if isinstance(modelo, lgb.Booster):
+        # Modelo LightGBM nativo (Booster)
+        # Predict devuelve probabilidades directamente
+        probabilidades = modelo.predict(texto_vector)[0]
+        emocion_idx = probabilidades.argmax()
+        confianza = probabilidades[emocion_idx]
+        
+        # Usar el encoder para mapear índice a clase
+        clases = encoder.classes_
+        emocion = clases[emocion_idx]
+        probs_dict = dict(zip(clases, probabilidades))
+    else:
+        # Modelo LGBMClassifier (sklearn wrapper)
+        emocion = modelo.predict(texto_vector)[0]
+        probabilidades = modelo.predict_proba(texto_vector)[0]
+        confianza = probabilidades.max()
+        clases = modelo.classes_
+        probs_dict = dict(zip(clases, probabilidades))
     
     return emocion, confianza, probs_dict, info_traduccion
 
@@ -330,7 +340,7 @@ with tab1:
     # Procesar predicción
     if predecir_btn and texto_input.strip():
         with st.spinner("🔄 Analizando..."):
-            emocion, confianza, probs_dict, info_traduccion = predecir_emocion(texto_input, modelo, vectorizer)
+            emocion, confianza, probs_dict, info_traduccion = predecir_emocion(texto_input, modelo, vectorizer, encoder)
             
             # Guardar TODO en session_state para mantener visible
             st.session_state.mostrar_resultado = True
