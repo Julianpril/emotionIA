@@ -5026,3 +5026,4 @@ timestamp,texto_original,texto_traducido,idioma,emocion_predicha,emocion_correct
 2025-10-27 12:00:00,Siento frustración por la falta de respuesta ante problemas con la duración de batería.,I feel frustrated by the duración de batería of the hotel.,es,sad,anger,0.607949,False
 2025-10-27 12:00:00,Me enfadó la mala velocidad del restaurante; no cumple lo prometido.,I was angered by the velocidad of the restaurante.,es,sad,anger,0.790651,False
 2025-10-27 15:32:41,Me quedé sin palabras al descubrir algo que jamás imaginé ver.,I was speechless when I discovered something I never imagined I would see.,es,joy,suprise,0.31258505382504215,False
+2025-11-04 11:40:24,Que lindo esta el dia,How beautiful the day is,es,joy,joy,0.506153226499094,True

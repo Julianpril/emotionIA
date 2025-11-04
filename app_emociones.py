@@ -5,9 +5,26 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from pathlib import Path
-from deep_translator import GoogleTranslator
-from langdetect import detect, LangDetectException
 import time
+
+# Manejo de dependencias críticas con mensajes claros
+try:
+    from deep_translator import GoogleTranslator
+    from langdetect import detect, LangDetectException
+except ModuleNotFoundError as e:
+    st.error(
+        f"❌ **Falta una dependencia crítica**: `{e.name}`\n\n"
+        "**Solución:**\n"
+        "1. Agrega `deep-translator>=1.11,<2` y `langdetect>=1.0.9` a `requirements.txt`\n"
+        "2. Ejecuta: `pip install deep-translator langdetect`\n"
+        "3. Reinicia la aplicación\n\n"
+        "**Para Streamlit Cloud:** Asegúrate de que `requirements.txt` tenga estas líneas:\n"
+        "```\n"
+        "deep-translator>=1.11,<2.0\n"
+        "langdetect>=1.0.9\n"
+        "```"
+    )
+    st.stop()
 
 # Configuración de la página
 st.set_page_config(
@@ -68,7 +85,7 @@ def cargar_recursos():
         
         with open(model_files[0], 'rb') as f:
             modelo = pickle.load(f)
-        st.success(f"✅ Modelo cargado: {model_files[0].name}")
+        st.success(f"Modelo cargado: {model_files[0].name}")
         
         vectorizer_files = sorted(models_dir.glob('tfidf_10k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
         if not vectorizer_files:
@@ -77,7 +94,7 @@ def cargar_recursos():
         
         with open(vectorizer_files[0], 'rb') as f:
             vectorizer = pickle.load(f)
-        st.success(f"✅ Vectorizador cargado: {vectorizer_files[0].name} (10,000 features)")
+        st.success(f"Vectorizador cargado: {vectorizer_files[0].name} (10,000 features)")
         
         # Cargar encoder
         encoder_files = sorted(models_dir.glob('label_encoder_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
@@ -87,7 +104,7 @@ def cargar_recursos():
         
         with open(encoder_files[0], 'rb') as f:
             encoder = pickle.load(f)
-        st.success(f"✅ Encoder cargado: {encoder_files[0].name}")
+        st.success(f"Encoder cargado: {encoder_files[0].name}")
         
         # Cargar configuración para mostrar accuracy
         config_files = sorted(models_dir.glob('config_lgbm_10k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
@@ -96,7 +113,7 @@ def cargar_recursos():
             with open(config_files[0], 'rb') as f:
                 config = pickle.load(f)
             accuracy = config.get('accuracy', 0.90)
-            st.success(f"✅ Accuracy del modelo: {accuracy*100:.2f}%")
+            st.success(f"Accuracy del modelo: {accuracy*100:.2f}%")
         
         return modelo, vectorizer, encoder
     
