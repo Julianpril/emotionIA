@@ -50,11 +50,11 @@ env/
 Thumbs.db
 desktop.ini
 
-# Models and Data (opcional, comenta si quieres versionar)
-models/*.pkl
-models/*.joblib
-*.h5
-*.hdf5
+# Models and Data (DESCOMENTADO para deploy en Streamlit Cloud)
+# models/*.pkl
+# models/*.joblib
+# *.h5
+# *.hdf5
 
 # Logs
 *.log
