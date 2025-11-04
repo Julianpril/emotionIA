@@ -78,42 +78,60 @@ def cargar_recursos():
             st.error("❌ La carpeta 'models/' no existe.")
             return None, None, None
         
-        model_files = sorted(models_dir.glob('lgbm_directo_5k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
-        if not model_files:
-            st.error("❌ No se encontró el modelo LightGBM guardado")
-            return None, None, None
+        # Buscar modelo LightGBM (primero sin timestamp, luego con timestamp)
+        model_file = models_dir / 'lgbm_directo_5k.pkl'
+        if not model_file.exists():
+            model_files = sorted(models_dir.glob('lgbm_directo_5k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
+            if not model_files:
+                st.error("❌ No se encontró el modelo LightGBM guardado")
+                return None, None, None
+            model_file = model_files[0]
         
-        with open(model_files[0], 'rb') as f:
+        with open(model_file, 'rb') as f:
             modelo = pickle.load(f)
-        st.success(f"Modelo cargado: {model_files[0].name}")
+        st.success(f"✅ Modelo cargado: {model_file.name}")
         
-        vectorizer_files = sorted(models_dir.glob('tfidf_10k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
-        if not vectorizer_files:
-            st.error("❌ No se encontró el vectorizador TF-IDF")
-            return None, None, None
+        # Buscar vectorizador TF-IDF (primero sin timestamp, luego con timestamp)
+        vectorizer_file = models_dir / 'tfidf_10k.pkl'
+        if not vectorizer_file.exists():
+            vectorizer_files = sorted(models_dir.glob('tfidf_10k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
+            if not vectorizer_files:
+                st.error("❌ No se encontró el vectorizador TF-IDF")
+                return None, None, None
+            vectorizer_file = vectorizer_files[0]
         
-        with open(vectorizer_files[0], 'rb') as f:
+        with open(vectorizer_file, 'rb') as f:
             vectorizer = pickle.load(f)
-        st.success(f"Vectorizador cargado: {vectorizer_files[0].name} (10,000 features)")
+        st.success(f"✅ Vectorizador cargado: {vectorizer_file.name} (10,000 features)")
         
-        # Cargar encoder
-        encoder_files = sorted(models_dir.glob('label_encoder_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
-        if not encoder_files:
-            st.error("❌ No se encontró el label encoder")
-            return None, None, None
+        # Cargar encoder (primero sin timestamp, luego con timestamp)
+        encoder_file = models_dir / 'label_encoder.pkl'
+        if not encoder_file.exists():
+            encoder_files = sorted(models_dir.glob('label_encoder_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
+            if not encoder_files:
+                st.error("❌ No se encontró el label encoder")
+                return None, None, None
+            encoder_file = encoder_files[0]
         
-        with open(encoder_files[0], 'rb') as f:
+        with open(encoder_file, 'rb') as f:
             encoder = pickle.load(f)
-        st.success(f"Encoder cargado: {encoder_files[0].name}")
+        st.success(f"✅ Encoder cargado: {encoder_file.name}")
         
-        # Cargar configuración para mostrar accuracy
-        config_files = sorted(models_dir.glob('config_lgbm_10k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
+        # Cargar configuración (primero sin timestamp, luego con timestamp)
+        config_file = models_dir / 'config.pkl'
         config = None
-        if config_files:
-            with open(config_files[0], 'rb') as f:
+        if config_file.exists():
+            with open(config_file, 'rb') as f:
                 config = pickle.load(f)
+        else:
+            config_files = sorted(models_dir.glob('config_lgbm_10k_*.pkl'), key=lambda x: x.stat().st_mtime, reverse=True)
+            if config_files:
+                with open(config_files[0], 'rb') as f:
+                    config = pickle.load(f)
+        
+        if config:
             accuracy = config.get('accuracy', 0.90)
-            st.success(f"Accuracy del modelo: {accuracy*100:.2f}%")
+            st.success(f"✅ Accuracy del modelo: {accuracy*100:.2f}%")
         
         return modelo, vectorizer, encoder
     
