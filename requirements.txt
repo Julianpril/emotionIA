@@ -34,11 +34,11 @@ deep-translator>=1.11,<2.0
 langdetect>=1.0.9
 
 # ============================================
-# PYCARET (Opcional - incluye profiling)
+# PYCARET (Opcional - solo para entrenamiento, NO necesario en producción)
 # ============================================
-pycaret==3.0.4
-ydata-profiling==4.5.1
-htmlmin==0.1.12
+# pycaret==3.0.4
+# ydata-profiling==4.5.1
+# htmlmin==0.1.12
 
 # ============================================
 # MODEL PERSISTENCE
@@ -54,7 +54,7 @@ pytz==2023.3
 tqdm==4.66.1
 
 # ============================================
-# DATA VALIDATION
+# VALIDATION (Streamlit requiere pydantic>=2)
 # ============================================
 pydantic>=2.0.0,<3.0.0
 
